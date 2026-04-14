@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:virgo/core/constants/app_constants.dart';
 import 'package:virgo/core/database/app_database.dart';
-import 'package:virgo/core/theme/app_colors.dart';
 import 'package:virgo/core/utils/date_utils.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 import 'package:virgo/models/enums.dart';
 import 'package:virgo/widgets/animated_avatar.dart';
 import 'package:virgo/widgets/glossy_card.dart';
@@ -25,9 +25,6 @@ class UpdateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return GlossyCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,9 +53,9 @@ class UpdateCard extends StatelessWidget {
                           ),
                         ),
                         if (update.isPinned)
-                          const Icon(
+                          Icon(
                             Icons.push_pin,
-                            color: AppColors.gold,
+                            color: context.colorScheme.secondary,
                             size: 16,
                           ),
                       ],
@@ -67,7 +64,7 @@ class UpdateCard extends StatelessWidget {
                     Text(
                       AppDateUtils.formatRelative(update.createdAt),
                       style: TextStyle(
-                        color: theme.textTheme.bodySmall?.color?.withValues(alpha:0.6),
+                        color: context.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                         fontSize: 12,
                       ),
                     ),
@@ -81,21 +78,22 @@ class UpdateCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: isDark 
-                  ? AppColors.gold.withValues(alpha:0.15) 
-                  : AppColors.goldLight.withValues(alpha:0.3),
+              color: context.isDark
+                  ? context.appColors.gold.withValues(alpha: 0.15)
+                  : context.appColors.goldLight.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppColors.gold.withValues(alpha:0.5),
+                color: context.appColors.gold.withValues(alpha: 0.5),
                 width: 0.5,
               ),
             ),
             child: Text(
-              AppConstants.getCategoryLabel(UpdateCategory.values.firstWhere((c) => c.name == update.category)).toUpperCase(),
-              style: const TextStyle(
+              AppConstants.getCategoryLabel(UpdateCategory.values.firstWhere((c) => c.name == update.category))
+                  .toUpperCase(),
+              style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: AppColors.goldDeep,
+                color: context.appColors.goldDeep,
                 letterSpacing: 1,
               ),
             ),
@@ -103,14 +101,14 @@ class UpdateCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             update.title,
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: isDark ? AppColors.surfaceLight : AppColors.wineDeep,
+            style: context.textTheme.titleLarge?.copyWith(
+              color: context.isDark ? context.colorScheme.onSurface : context.appColors.wineDeep,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             update.content,
-            style: theme.textTheme.bodyMedium?.copyWith(
+            style: context.textTheme.bodyMedium?.copyWith(
               height: 1.5,
             ),
           ),
@@ -124,7 +122,7 @@ class UpdateCard extends StatelessWidget {
                   onPressed: onPinToggle,
                   icon: Icon(
                     update.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                    color: update.isPinned ? AppColors.gold : null,
+                    color: update.isPinned ? context.colorScheme.secondary : null,
                   ),
                   tooltip: update.isPinned ? 'Unpin Post' : 'Pin Post',
                 ),
@@ -135,9 +133,9 @@ class UpdateCard extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: onDelete,
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.delete_outline,
-                    color: AppColors.errorLight,
+                    color: context.colorScheme.error,
                   ),
                   tooltip: 'Delete Post',
                 ),
@@ -149,3 +147,4 @@ class UpdateCard extends StatelessWidget {
     );
   }
 }
+

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:virgo/core/theme/app_colors.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 
 class GradientButton extends StatefulWidget {
   final String text;
@@ -44,8 +44,8 @@ class _GradientButtonState extends State<GradientButton> with SingleTickerProvid
     final isDisabled = widget.onPressed == null || widget.isLoading;
 
     final List<Color> gradientColors = widget.isSecondary
-        ? [AppColors.goldDeep, AppColors.gold, AppColors.goldLight]
-        : [AppColors.wineDeep, AppColors.wine, AppColors.wineLight];
+        ? [context.appColors.goldDeep, context.appColors.gold, context.appColors.goldLight]
+        : [context.appColors.wineDeep, context.appColors.wine, context.appColors.wineLight];
 
     return GestureDetector(
       onTapDown: isDisabled ? null : (_) => _controller.forward(),
@@ -70,7 +70,7 @@ class _GradientButtonState extends State<GradientButton> with SingleTickerProvid
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: gradientColors.first.withValues(alpha:0.3),
+                    color: gradientColors.first.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -95,7 +95,7 @@ class _GradientButtonState extends State<GradientButton> with SingleTickerProvid
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            Colors.white.withValues(alpha:0.3),
+                            Colors.white.withValues(alpha: 0.3),
                             Colors.transparent,
                           ],
                         ),
@@ -110,7 +110,7 @@ class _GradientButtonState extends State<GradientButton> with SingleTickerProvid
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          widget.isSecondary ? AppColors.wineDeep : AppColors.surfaceLight,
+                          widget.isSecondary ? context.appColors.wineDeep : context.colorScheme.onPrimary,
                         ),
                       ),
                     )
@@ -120,9 +120,7 @@ class _GradientButtonState extends State<GradientButton> with SingleTickerProvid
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: widget.isSecondary 
-                            ? AppColors.wineDeep 
-                            : AppColors.surfaceLight,
+                        color: widget.isSecondary ? context.appColors.wineDeep : context.colorScheme.onPrimary,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -135,3 +133,4 @@ class _GradientButtonState extends State<GradientButton> with SingleTickerProvid
     );
   }
 }
+

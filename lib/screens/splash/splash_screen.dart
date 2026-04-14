@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:virgo/core/theme/app_colors.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,52 +12,67 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 2500), () {
-      if (mounted) {
-        // GoRouter redirect guards will actually handle where to go 
-        // if this is blocked, but we'll try to go to login.
-        context.go('/login');
-      }
-    });
+    // Background initialization is handled by GoRouter's redirect logic
+    // which listens to authStateProvider and settingsStateProvider.
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.wineDeep,
-              AppColors.wine,
-              AppColors.wineLight,
+              context.appColors.wineDeep,
+              context.appColors.wine,
+              context.appColors.wineLight,
             ],
           ),
         ),
-        child: const Center(
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.school_rounded,
-                size: 80,
-                color: AppColors.gold,
+              // Local App Icon
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: context.appColors.gold.withValues(alpha: 0.5),
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/app_icon.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 32),
               Text(
                 'VIRGO',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 8,
-                  color: AppColors.surfaceLight,
+                  color: context.colorScheme.onPrimary,
                 ),
               ),
-              SizedBox(height: 48),
+              const SizedBox(height: 48),
               CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.gold),
+                valueColor: AlwaysStoppedAnimation<Color>(context.appColors.gold),
               ),
             ],
           ),
@@ -67,3 +81,4 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
+

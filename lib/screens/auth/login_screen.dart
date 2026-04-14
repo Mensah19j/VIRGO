@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:virgo/core/theme/app_colors.dart';
-import 'package:virgo/core/utils/validators.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 import 'package:virgo/providers/auth_provider.dart';
 import 'package:virgo/widgets/app_text_field.dart';
 import 'package:virgo/widgets/glossy_card.dart';
 import 'package:virgo/widgets/gradient_button.dart';
+import 'package:virgo/widgets/theme_switcher.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -42,7 +42,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(authState.error.toString().replaceAll('Exception: ', '')),
-            backgroundColor: AppColors.errorLight,
+            backgroundColor: context.colorScheme.error,
           ),
         );
       }
@@ -51,11 +51,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final authState = ref.watch(authStateProvider);
     final isLoading = authState.isLoading;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        actions: const [ThemeSwitcher()],
+      ),
       body: SingleChildScrollView(
         child: Container(
           height: MediaQuery.of(context).size.height,
@@ -64,8 +69,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
-                isDark ? AppColors.surfaceElevatedDark : AppColors.surfaceElevatedLight,
+                context.colorScheme.surface,
+                context.colorScheme.surfaceContainerHighest,
               ],
             ),
           ),
@@ -76,21 +81,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Logo/Branding
-                  const Icon(
-                    Icons.school_rounded,
-                    size: 64,
-                    color: AppColors.gold,
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: context.colorScheme.onPrimary.withValues(alpha: 0.1),
+                      border: Border.all(
+                        color: context.appColors.gold.withValues(alpha: 0.5),
+                        width: 2,
+                      ),
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/app_icon.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'Welcome Back',
-                    style: Theme.of(context).textTheme.displaySmall,
+                    style: context.textTheme.displaySmall,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Sign in to continue to Virgo',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                    style: context.textTheme.bodyLarge?.copyWith(
+                      color: context.isDark ? context.appColors.goldLight : context.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                   const SizedBox(height: 48),
@@ -107,7 +125,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             hint: 'Enter your school email',
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            validator: Validators.validateEmail,
+                            validator: (val) {
+                              if (val == null || val.isEmpty) return 'Email is required';
+                              return null;
+                            },
                           ),
                           const SizedBox(height: 20),
                           AppTextField(
@@ -116,7 +137,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             controller: _passwordController,
                             isPassword: true,
                             textInputAction: TextInputAction.done,
-                            validator: Validators.validatePassword,
+                            validator: (val) {
+                              if (val == null || val.isEmpty) return 'Password is required';
+                              return null;
+                            },
                             onSubmitted: (_) => _handleLogin(),
                           ),
                           const SizedBox(height: 32),
@@ -139,13 +163,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Text(
                         'Don\'t have an account?',
                         style: TextStyle(
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                          color: context.colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                       TextButton(
                         onPressed: isLoading ? null : () => context.go('/register'),
                         style: TextButton.styleFrom(
-                          foregroundColor: AppColors.wine,
+                          foregroundColor: context.colorScheme.primary,
                         ),
                         child: const Text('Register here'),
                       ),
@@ -164,7 +188,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           'OR',
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                            color: context.colorScheme.onSurface.withValues(alpha: 0.6),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -179,15 +203,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Center(
                     child: TextButton.icon(
                       onPressed: isLoading ? null : () => context.go('/staff-login'),
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.admin_panel_settings_outlined,
                         size: 18,
-                        color: AppColors.goldDeep,
+                        color: context.colorScheme.secondary,
                       ),
-                      label: const Text(
+                      label: Text(
                         'Are you a staff member? Click here',
                         style: TextStyle(
-                          color: AppColors.goldDeep,
+                          color: context.colorScheme.secondary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -202,3 +226,4 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 }
+

@@ -1,26 +1,31 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
+import 'app_colors_extension.dart';
 import 'app_typography.dart';
 
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
+      brightness: Brightness.light,
       colorScheme: const ColorScheme(
         brightness: Brightness.light,
         primary: AppColors.wine,
         onPrimary: AppColors.surfaceLight,
+        primaryContainer: AppColors.wineLight,
+        onPrimaryContainer: AppColors.surfaceLight,
         secondary: AppColors.gold,
         onSecondary: AppColors.surfaceLight,
+        secondaryContainer: AppColors.goldLight,
         error: AppColors.errorLight,
         onError: AppColors.surfaceLight,
         surface: AppColors.surfaceLight,
         onSurface: AppColors.textPrimaryLight,
-        // Added manually for context
         surfaceContainerHighest: AppColors.surfaceElevatedLight,
         outline: AppColors.borderLight,
       ),
       scaffoldBackgroundColor: AppColors.backgroundLight,
+      extensions: const [AppColorsExtension.light],
       textTheme: AppTypography.textTheme.apply(
         bodyColor: AppColors.textPrimaryLight,
         displayColor: AppColors.textPrimaryLight,
@@ -41,7 +46,7 @@ class AppTheme {
           backgroundColor: AppColors.wine,
           foregroundColor: AppColors.surfaceLight,
           elevation: 2,
-          shadowColor: AppColors.wine.withValues(alpha:0.4),
+          shadowColor: AppColors.wine.withValues(alpha: 0.4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -52,7 +57,7 @@ class AppTheme {
         color: AppColors.surfaceLight,
         surfaceTintColor: Colors.transparent,
         elevation: 4,
-        shadowColor: AppColors.wine.withValues(alpha:0.08),
+        shadowColor: AppColors.wine.withValues(alpha: 0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: AppColors.borderLight, width: 1),
@@ -86,16 +91,35 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.surfaceLight,
+        indicatorColor: AppColors.gold.withValues(alpha: 0.1),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(color: AppColors.wine, fontWeight: FontWeight.bold);
+          }
+          return const TextStyle(color: AppColors.textSecondaryLight);
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: AppColors.wine);
+          }
+          return const IconThemeData(color: AppColors.textSecondaryLight);
+        }),
+      ),
     );
   }
 
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
+      brightness: Brightness.dark,
       colorScheme: const ColorScheme(
         brightness: Brightness.dark,
-        primary: AppColors.wineLight, // Lighter for dark mode visibility
+        primary: AppColors.wineLight,
         onPrimary: AppColors.surfaceDark,
+        primaryContainer: AppColors.wine,
+        onPrimaryContainer: AppColors.surfaceDark,
         secondary: AppColors.gold,
         onSecondary: AppColors.surfaceDark,
         error: AppColors.errorDark,
@@ -106,6 +130,7 @@ class AppTheme {
         outline: AppColors.borderDark,
       ),
       scaffoldBackgroundColor: AppColors.backgroundDark,
+      extensions: const [AppColorsExtension.dark],
       textTheme: AppTypography.textTheme.apply(
         bodyColor: AppColors.textPrimaryDark,
         displayColor: AppColors.textPrimaryDark,
@@ -126,7 +151,7 @@ class AppTheme {
           backgroundColor: AppColors.wineLight,
           foregroundColor: AppColors.surfaceDark,
           elevation: 2,
-          shadowColor: AppColors.wineDeep.withValues(alpha:0.4),
+          shadowColor: AppColors.wineDeep.withValues(alpha: 0.4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -137,7 +162,7 @@ class AppTheme {
         color: AppColors.surfaceDark,
         surfaceTintColor: Colors.transparent,
         elevation: 4,
-        shadowColor: Colors.black.withValues(alpha:0.4),
+        shadowColor: Colors.black.withValues(alpha: 0.4),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: AppColors.borderDark, width: 1),
@@ -171,6 +196,23 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.surfaceDark,
+        indicatorColor: AppColors.gold.withValues(alpha: 0.1),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(color: AppColors.gold, fontWeight: FontWeight.bold);
+          }
+          return const TextStyle(color: AppColors.textSecondaryDark);
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: AppColors.gold);
+          }
+          return const IconThemeData(color: AppColors.textSecondaryDark);
+        }),
+      ),
     );
   }
 }
+

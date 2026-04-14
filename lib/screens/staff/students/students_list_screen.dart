@@ -4,11 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:virgo/core/constants/app_constants.dart';
 import 'package:virgo/core/database/app_database.dart';
 import 'package:virgo/core/theme/app_colors.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 import 'package:virgo/providers/drift_database_provider.dart';
 import 'package:virgo/repositories/auth_repository.dart';
 import 'package:virgo/repositories/motivation_repository.dart';
 import 'package:virgo/widgets/animated_avatar.dart';
 import 'package:virgo/widgets/loading_indicator.dart';
+import 'package:virgo/widgets/theme_switcher.dart';
 
 class StudentsListScreen extends ConsumerStatefulWidget {
   const StudentsListScreen({super.key});
@@ -82,6 +84,7 @@ class _StudentsListScreenState extends ConsumerState<StudentsListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Students Directory'),
+        actions: const [ThemeSwitcher()],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(130),
           child: Padding(
@@ -95,9 +98,9 @@ class _StudentsListScreenState extends ConsumerState<StudentsListScreen> {
                   },
                   decoration: InputDecoration(
                     hintText: 'Search students by name...',
-                    prefixIcon: const Icon(Icons.search),
+                    prefixIcon: const Icon(Icons.search_rounded),
                     filled: true,
-                    fillColor: Theme.of(context).cardTheme.color,
+                    fillColor: context.colorScheme.surfaceContainerHighest,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide.none,
@@ -157,7 +160,12 @@ class _StudentsListScreenState extends ConsumerState<StudentsListScreen> {
 
                     return Card(
                       margin: const EdgeInsets.only(bottom: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(
+                          color: context.colorScheme.outline.withValues(alpha: 0.1),
+                        ),
+                      ),
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(12),
                         leading: AnimatedAvatar(name: student.name, radius: 24),
@@ -173,7 +181,7 @@ class _StudentsListScreenState extends ConsumerState<StudentsListScreen> {
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: AppColors.getMotivationColor(latestLevel).withValues(alpha:0.2),
+                                  color: AppColors.getMotivationColor(latestLevel).withValues(alpha: 0.2),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Text(
@@ -184,16 +192,13 @@ class _StudentsListScreenState extends ConsumerState<StudentsListScreen> {
                             else
                               const Tooltip(
                                 message: 'No entry today',
-                                child: Icon(Icons.help_outline, color: Colors.grey),
+                                child: Icon(Icons.help_outline_rounded, color: Colors.grey),
                               ),
                             const SizedBox(width: 8),
-                            const Icon(Icons.chevron_right, color: Colors.grey),
+                            const Icon(Icons.chevron_right_rounded, color: Colors.grey),
                           ],
                         ),
                         onTap: () {
-                          // Navigate to detail
-                          // Since we don't have nested parameterized routes yet, 
-                          // we can use a stateful extra or simple push.
                           context.push('/staff/students/${student.id}');
                         },
                       ),
@@ -203,3 +208,4 @@ class _StudentsListScreenState extends ConsumerState<StudentsListScreen> {
     );
   }
 }
+

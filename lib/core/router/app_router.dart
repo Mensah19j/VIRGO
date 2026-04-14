@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:virgo/models/enums.dart';
 import 'package:virgo/providers/auth_provider.dart';
@@ -6,8 +8,6 @@ import 'package:virgo/providers/settings_provider.dart';
 import 'package:virgo/screens/auth/login_screen.dart';
 import 'package:virgo/screens/auth/register_screen.dart';
 import 'package:virgo/screens/auth/staff_login_screen.dart';
-import 'package:virgo/screens/onboarding/onboarding_screen.dart';
-import 'package:virgo/screens/splash/splash_screen.dart';
 // Student routes
 import 'package:virgo/screens/student/student_shell.dart';
 import 'package:virgo/screens/student/feed/student_feed_screen.dart';
@@ -26,20 +26,15 @@ part 'app_router.g.dart';
 
 @riverpod
 GoRouter router(RouterRef ref) {
-  final authState = ref.watch(authStateProvider);
-  final settingsState = ref.watch(settingsStateProvider);
-
+  // We DO NOT watch providers here. Watching providers in the body of the router provider
+  // causes the GoRouter instance to be recreated every time auth/settings change,
+  // which resets the navigation stack to the initialLocation.
+  
   return GoRouter(
-    initialLocation: '/splash',
+    initialLocation: '/login',
+    refreshListenable: _RouterRefreshNotifier(ref),
+    debugLogDiagnostics: true, // Enable for better terminal visibility
     routes: [
-      GoRoute(
-        path: '/splash',
-        builder: (context, state) => const SplashScreen(),
-      ),
-      GoRoute(
-        path: '/onboarding',
-        builder: (context, state) => const OnboardingScreen(),
-      ),
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
@@ -55,7 +50,7 @@ GoRouter router(RouterRef ref) {
       ShellRoute(
         builder: (context, state, child) {
           final user = ref.read(authStateProvider).valueOrNull;
-          if (user?.role == UserRole.student) {
+          if (user?.role == UserRole.student.name) {
             return StudentShell(child: child);
           }
           return StaffShell(child: child); 
@@ -110,40 +105,57 @@ GoRouter router(RouterRef ref) {
       )
     ],
     redirect: (context, state) {
-      if (settingsState.isLoading || authState.isLoading) {
-        return null;
+      // Always read the freshest state from the providers
+      final currentAuth = ref.read(authStateProvider);
+      final currentSettings = ref.read(settingsStateProvider);
+
+      final isLoading = currentSettings.isLoading || currentAuth.isLoading;
+      
+      if (isLoading) {
+        print('[Virgo] Router Loading: settings=${currentSettings.isLoading}, auth=${currentAuth.isLoading}');
       }
       
-      final settings = settingsState.valueOrNull;
-      final user = authState.valueOrNull;
-      
-      final isSplash = state.uri.path == '/splash';
-      final isOnboarding = state.uri.path == '/onboarding';
+      final settings = currentSettings.valueOrNull;
+      final user = currentAuth.valueOrNull;
+
       final isLogin = state.uri.path == '/login';
       final isRegister = state.uri.path == '/register';
       final isStaffLogin = state.uri.path == '/staff-login';
+      final isAuthPage = isLogin || isRegister || isStaffLogin;
 
-      if (settings != null && !settings.hasCompletedOnboarding) {
-        if (!isOnboarding) return '/onboarding';
+      // 1. While loading, stay put
+      if (isLoading) {
         return null;
       }
 
+      // 2. Handle Authenticated Users
       if (user != null) {
-        if (isSplash || isOnboarding || isLogin || isRegister) {
-          if (user.role == UserRole.student) {
-            return '/student/feed';
-          } else {
-            return '/staff/feed'; // Placeholder for next section
-          }
+        // If logged in, don't allow access to auth pages
+        if (isAuthPage) {
+          return (user.role == UserRole.student.name) 
+              ? '/student/feed' 
+              : '/staff/feed';
         }
-      } else {
-        if (!isLogin && !isRegister && !isSplash && !isStaffLogin) {
-          return '/login';
-        }
+        return null; // Stay on requested authenticated route
+      } 
+
+      // 3. Handle Unauthenticated Users
+      if (!isAuthPage) {
+        return '/login';
       }
 
       return null;
     },
   );
+}
+
+/// A notifier that bridges Riverpod states to GoRouter's refreshListenable.
+/// This ensures the router re-evaluates redirects whenever auth or settings change.
+class _RouterRefreshNotifier extends ChangeNotifier {
+  _RouterRefreshNotifier(Ref ref) {
+    // Listen to all providers that affect navigation
+    ref.listen(authStateProvider, (_, __) => notifyListeners());
+    ref.listen(settingsStateProvider, (_, __) => notifyListeners());
+  }
 }
 

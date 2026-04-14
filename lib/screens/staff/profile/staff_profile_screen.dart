@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:virgo/core/theme/app_colors.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 import 'package:virgo/providers/auth_provider.dart';
-import 'package:virgo/providers/theme_provider.dart';
 import 'package:virgo/widgets/animated_avatar.dart';
 import 'package:virgo/widgets/glossy_card.dart';
 import 'package:virgo/widgets/gradient_button.dart';
+import 'package:virgo/widgets/theme_switcher.dart';
 
 class StaffProfileScreen extends ConsumerWidget {
   const StaffProfileScreen({super.key});
@@ -13,23 +13,13 @@ class StaffProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authStateProvider).valueOrNull;
-    final themeMode = ref.watch(themeModeProvider);
-    final isDark = themeMode == ThemeMode.dark;
 
     if (user == null) return const SizedBox.shrink();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Staff Profile'),
-        actions: [
-          IconButton(
-            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
-            onPressed: () {
-              ref.read(themeModeProvider.notifier).toggleTheme();
-            },
-            tooltip: 'Toggle Theme',
-          ),
-        ],
+        actions: const [ThemeSwitcher()],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -45,15 +35,15 @@ class StaffProfileScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             Text(
               user.name,
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: context.textTheme.headlineMedium,
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Staff Member',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.goldDeep,
+                color: context.appColors.goldDeep,
               ),
             ),
             const SizedBox(height: 48),
@@ -61,13 +51,13 @@ class StaffProfileScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.email_outlined, color: AppColors.wine),
+                    leading: Icon(Icons.email_outlined, color: context.appColors.wine),
                     title: const Text('Email Address'),
                     subtitle: Text(user.email),
                   ),
                   const Divider(),
                   ListTile(
-                    leading: const Icon(Icons.security_outlined, color: AppColors.wine),
+                    leading: Icon(Icons.security_outlined, color: context.appColors.wine),
                     title: const Text('Access Level'),
                     subtitle: const Text('Full Administrative Access'),
                   ),
@@ -88,3 +78,4 @@ class StaffProfileScreen extends ConsumerWidget {
     );
   }
 }
+

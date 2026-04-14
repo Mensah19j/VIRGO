@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:virgo/core/database/app_database.dart';
-import 'package:virgo/core/theme/app_colors.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 import 'package:virgo/providers/drift_database_provider.dart';
 import 'package:virgo/repositories/auth_repository.dart';
 import 'package:virgo/repositories/motivation_repository.dart';
@@ -10,6 +10,7 @@ import 'package:virgo/widgets/animated_avatar.dart';
 import 'package:virgo/widgets/empty_state.dart';
 import 'package:virgo/widgets/loading_indicator.dart';
 import 'package:virgo/widgets/section_header.dart';
+import 'package:virgo/widgets/theme_switcher.dart';
 import 'package:virgo/screens/staff/dashboard/widgets/motivation_line_chart.dart';
 
 class StudentDetailScreen extends ConsumerStatefulWidget {
@@ -58,8 +59,6 @@ class _StudentDetailScreenState extends ConsumerState<StudentDetailScreen> {
           if (entriesOnDay.isNotEmpty) {
             final avg = entriesOnDay.fold<int>(0, (p, e) => p + e.level) / entriesOnDay.length;
             map[i] = avg;
-          } else {
-            // No data point
           }
         }
         _chartData = map;
@@ -74,20 +73,29 @@ class _StudentDetailScreenState extends ConsumerState<StudentDetailScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Student Details')),
+        appBar: AppBar(
+          title: const Text('Student Details'),
+          actions: const [ThemeSwitcher()],
+        ),
         body: const LoadingIndicator(),
       );
     }
 
     if (_student == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Not Found')),
+        appBar: AppBar(
+          title: const Text('Not Found'),
+          actions: const [ThemeSwitcher()],
+        ),
         body: const Center(child: Text('Student not found.')),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(_student!.name)),
+      appBar: AppBar(
+        title: Text(_student!.name),
+        actions: const [ThemeSwitcher()],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -98,12 +106,12 @@ class _StudentDetailScreenState extends ConsumerState<StudentDetailScreen> {
                 const SizedBox(height: 16),
                 Text(
                   _student!.name,
-                  style: Theme.of(context).textTheme.headlineMedium,
+                  style: context.textTheme.headlineMedium,
                 ),
                 Text(
                   _student!.yearGroup ?? 'No Year Group',
-                  style: const TextStyle(
-                    color: AppColors.goldDeep,
+                  style: TextStyle(
+                    color: context.appColors.goldDeep,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -129,7 +137,7 @@ class _StudentDetailScreenState extends ConsumerState<StudentDetailScreen> {
             const EmptyState(
               title: 'No Logs',
               message: 'This student has not logged any motivation entries yet.',
-              icon: Icons.history,
+              icon: Icons.history_rounded,
             )
           else
             ..._history.map((entry) => MotivationHistoryTile(entry: entry)),
@@ -138,3 +146,4 @@ class _StudentDetailScreenState extends ConsumerState<StudentDetailScreen> {
     );
   }
 }
+

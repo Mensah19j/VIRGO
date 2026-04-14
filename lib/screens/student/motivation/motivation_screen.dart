@@ -9,6 +9,7 @@ import 'package:virgo/widgets/glossy_card.dart';
 import 'package:virgo/widgets/gradient_button.dart';
 import 'package:virgo/widgets/loading_indicator.dart';
 import 'package:virgo/widgets/section_header.dart';
+import 'package:virgo/widgets/theme_switcher.dart';
 
 class MotivationScreen extends ConsumerStatefulWidget {
   const MotivationScreen({super.key});
@@ -44,6 +45,7 @@ class _MotivationScreenState extends ConsumerState<MotivationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Daily Motivation'),
+        actions: const [ThemeSwitcher()],
       ),
       body: CustomScrollView(
         slivers: [
@@ -63,8 +65,8 @@ class _MotivationScreenState extends ConsumerState<MotivationScreen> {
                       children: [
                         Text(
                           hasLogged 
-                              ? 'You have already logged your motivation today.'
-                              : 'How are you feeling today?',
+                               ? 'You have already logged your motivation today.'
+                               : 'How are you feeling today?',
                           style: Theme.of(context).textTheme.titleLarge,
                           textAlign: TextAlign.center,
                         ),
@@ -139,3 +141,4 @@ class _MotivationScreenState extends ConsumerState<MotivationScreen> {
     );
   }
 }
+

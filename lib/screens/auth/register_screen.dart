@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:virgo/core/constants/app_constants.dart';
-import 'package:virgo/core/theme/app_colors.dart';
-import 'package:virgo/core/utils/validators.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 import 'package:virgo/providers/auth_provider.dart';
 import 'package:virgo/widgets/app_text_field.dart';
 import 'package:virgo/widgets/glossy_card.dart';
 import 'package:virgo/widgets/gradient_button.dart';
+import 'package:virgo/widgets/theme_switcher.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -36,9 +36,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       if (_selectedYearGroup == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select a Year Group'),
-            backgroundColor: AppColors.errorLight,
+          SnackBar(
+            content: const Text('Please select a Year Group'),
+            backgroundColor: context.colorScheme.error,
           ),
         );
         return;
@@ -58,7 +58,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(authState.error.toString().replaceAll('Exception: ', '')),
-            backgroundColor: AppColors.errorLight,
+            backgroundColor: context.colorScheme.error,
           ),
         );
       }
@@ -67,11 +67,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final authState = ref.watch(authStateProvider);
     final isLoading = authState.isLoading;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => context.go('/login'),
+        ),
+        actions: const [ThemeSwitcher()],
+      ),
       body: SingleChildScrollView(
         child: Container(
           constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height),
@@ -80,42 +89,51 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
-                isDark ? AppColors.surfaceElevatedDark : AppColors.surfaceElevatedLight,
+                context.colorScheme.surface,
+                context.colorScheme.surfaceContainerHighest,
               ],
             ),
           ),
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () => context.go('/login'),
-                    ),
-                  ),
                   const SizedBox(height: 16),
-
                   // Icon
-                  const Center(
-                    child: Icon(Icons.school_rounded, size: 52, color: AppColors.gold),
+                  Center(
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: context.colorScheme.onPrimary.withValues(alpha: 0.1),
+                        border: Border.all(
+                          color: context.appColors.gold.withValues(alpha: 0.5),
+                          width: 2,
+                        ),
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/app_icon.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
 
                   Text(
                     'Create Account',
-                    style: Theme.of(context).textTheme.displaySmall,
+                    style: context.textTheme.displaySmall,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Join the Virgo community as a student',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                    style: context.textTheme.bodyLarge?.copyWith(
+                      color: context.isDark ? context.appColors.goldLight : context.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -131,7 +149,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             label: 'Full Name',
                             hint: 'Enter your full name',
                             controller: _nameController,
-                            validator: Validators.validateName,
+                            validator: (val) {
+                              if (val == null || val.isEmpty) return 'Name is required';
+                              return null;
+                            },
                           ),
                           const SizedBox(height: 16),
                           AppTextField(
@@ -139,7 +160,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             hint: 'Enter your school email',
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            validator: Validators.validateEmail,
+                            validator: (val) {
+                              if (val == null || val.isEmpty) return 'Email is required';
+                              return null;
+                            },
                           ),
                           const SizedBox(height: 16),
                           AppTextField(
@@ -147,19 +171,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             hint: 'Create a password',
                             controller: _passwordController,
                             isPassword: true,
-                            validator: Validators.validatePassword,
+                            validator: (val) {
+                              if (val == null || val.isEmpty) return 'Password is required';
+                              if (val.length < 6) return 'Password too short';
+                              return null;
+                            },
                           ),
                           const SizedBox(height: 24),
 
                           // Year Group Dropdown
-                          const Padding(
-                            padding: EdgeInsets.only(left: 4.0, bottom: 8.0),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
                             child: Text(
                               'Year Group',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.wineLight,
+                                color: context.colorScheme.primary.withValues(alpha: 0.85),
                               ),
                             ),
                           ),
@@ -168,11 +196,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             hint: const Text('Select your year group'),
                             decoration: InputDecoration(
                               filled: true,
-                              fillColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                              fillColor: context.colorScheme.surface,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
                                 borderSide: BorderSide(
-                                  color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                                  color: context.colorScheme.outline,
                                 ),
                               ),
                             ),
@@ -205,12 +233,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       Text(
                         'Already have an account?',
                         style: TextStyle(
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                          color: context.colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                       TextButton(
                         onPressed: isLoading ? null : () => context.go('/login'),
-                        style: TextButton.styleFrom(foregroundColor: AppColors.wine),
+                        style: TextButton.styleFrom(foregroundColor: context.colorScheme.primary),
                         child: const Text('Log in'),
                       ),
                     ],
@@ -224,3 +252,4 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 }
+

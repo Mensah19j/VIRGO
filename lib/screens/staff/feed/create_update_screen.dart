@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:virgo/core/constants/app_constants.dart';
-import 'package:virgo/core/theme/app_colors.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 import 'package:virgo/models/enums.dart';
 import 'package:virgo/providers/school_update_provider.dart';
 import 'package:virgo/widgets/app_text_field.dart';
 import 'package:virgo/widgets/gradient_button.dart';
+import 'package:virgo/widgets/theme_switcher.dart';
 
 class CreateUpdateScreen extends ConsumerStatefulWidget {
   const CreateUpdateScreen({super.key});
@@ -47,11 +48,10 @@ class _CreateUpdateScreenState extends ConsumerState<CreateUpdateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Update'),
+        actions: const [ThemeSwitcher()],
       ),
       body: Form(
         key: _formKey,
@@ -72,14 +72,14 @@ class _CreateUpdateScreenState extends ConsumerState<CreateUpdateScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(left: 4.0, bottom: 8.0),
+                Padding(
+                  padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
                   child: Text(
                     'Category',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.wineLight,
+                      color: context.colorScheme.primary.withValues(alpha: 0.85),
                     ),
                   ),
                 ),
@@ -87,11 +87,11 @@ class _CreateUpdateScreenState extends ConsumerState<CreateUpdateScreen> {
                   initialValue: _selectedCategory,
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                    fillColor: context.colorScheme.surface,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                        color: context.colorScheme.outline,
                       ),
                     ),
                   ),
@@ -127,7 +127,7 @@ class _CreateUpdateScreenState extends ConsumerState<CreateUpdateScreen> {
               title: const Text('Pin to top of feed'),
               subtitle: const Text('Pinned updates are always visible first.'),
               value: _isPinned,
-              activeThumbColor: AppColors.gold,
+              activeThumbColor: context.appColors.gold,
               contentPadding: EdgeInsets.zero,
               onChanged: (val) => setState(() => _isPinned = val),
             ),
@@ -143,3 +143,4 @@ class _CreateUpdateScreenState extends ConsumerState<CreateUpdateScreen> {
     );
   }
 }
+

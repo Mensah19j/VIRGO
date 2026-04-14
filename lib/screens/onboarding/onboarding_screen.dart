@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:virgo/core/theme/app_colors.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 import 'package:virgo/providers/settings_provider.dart';
 import 'package:virgo/screens/onboarding/widgets/onboarding_page.dart';
 import 'package:virgo/widgets/gradient_button.dart';
+import 'package:virgo/widgets/theme_switcher.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -25,41 +25,46 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   void _completeOnboarding() async {
     await ref.read(settingsStateProvider.notifier).setOnboardingComplete();
-    if (mounted) {
-      context.go('/login');
-    }
+    // Navigation is handled automatically by the GoRouter redirect logic
+    // once settingsStateProvider notifies the router of the change.
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.wineDeep,
-              AppColors.wine,
-              AppColors.wineLight,
+              context.appColors.wineDeep,
+              context.appColors.wine,
+              context.appColors.wineLight,
             ],
           ),
         ),
         child: SafeArea(
           child: Column(
             children: [
-              // Skip button
-              Align(
-                alignment: Alignment.topRight,
-                child: TextButton(
-                  onPressed: _completeOnboarding,
-                  child: const Text(
-                    'Skip',
-                    style: TextStyle(
-                      color: AppColors.goldLight,
-                      fontWeight: FontWeight.bold,
+              // Top Bar with Switcher and Skip
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ThemeSwitcher(color: context.appColors.goldLight),
+                    TextButton(
+                      onPressed: _completeOnboarding,
+                      child: Text(
+                        'Skip',
+                        style: TextStyle(
+                          color: context.appColors.goldLight,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
               
@@ -76,7 +81,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     OnboardingPage(
                       title: 'Welcome\nto Virgo',
                       description: 'Your premier companion for school journey and personal growth.',
-                      icon: Icons.school_rounded,
+                      imagePath: 'assets/app_icon.png',
                     ),
                     OnboardingPage(
                       title: 'Track Your\nMotivation',
@@ -109,8 +114,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           width: _currentPage == index ? 24.0 : 8.0,
                           decoration: BoxDecoration(
                             color: _currentPage == index
-                                ? AppColors.gold
-                                : AppColors.goldLight.withValues(alpha:0.3),
+                                ? context.appColors.gold
+                                : context.appColors.goldLight.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(4.0),
                           ),
                         ),
@@ -145,3 +150,4 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 }
+

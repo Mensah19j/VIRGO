@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:virgo/core/constants/app_constants.dart';
-import 'package:virgo/core/theme/app_colors.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 import 'package:virgo/models/enums.dart';
 import 'package:virgo/providers/school_update_provider.dart';
 import 'package:virgo/widgets/empty_state.dart';
 import 'package:virgo/widgets/loading_indicator.dart';
+import 'package:virgo/widgets/theme_switcher.dart';
 import 'package:virgo/widgets/update_card.dart';
 
 class StaffFeedScreen extends ConsumerStatefulWidget {
@@ -26,11 +27,12 @@ class _StaffFeedScreenState extends ConsumerState<StaffFeedScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Manage News'),
+        actions: const [ThemeSwitcher()],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.go('/staff/feed/create'),
-        backgroundColor: AppColors.gold,
-        foregroundColor: AppColors.wineDeep,
+        backgroundColor: context.colorScheme.secondary,
+        foregroundColor: context.colorScheme.onSecondary,
         child: const Icon(Icons.add),
       ),
       body: Column(
@@ -116,7 +118,7 @@ class _StaffFeedScreenState extends ConsumerState<StaffFeedScreen> {
                                           ref.read(schoolUpdatesProvider().notifier).deleteUpdate(update.id);
                                           Navigator.pop(context);
                                         },
-                                        style: TextButton.styleFrom(foregroundColor: AppColors.errorLight),
+                                        style: TextButton.styleFrom(foregroundColor: context.colorScheme.error),
                                         child: const Text('Delete'),
                                       ),
                                     ],
@@ -139,3 +141,4 @@ class _StaffFeedScreenState extends ConsumerState<StaffFeedScreen> {
     );
   }
 }
+

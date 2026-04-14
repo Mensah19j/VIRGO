@@ -197,20 +197,26 @@ class AuthRepository {
     final settings = await _db.select(_db.appSettings).getSingleOrNull();
     if (settings == null) {
       await ensureSettingsInitialized();
-      return await _db.select(_db.appSettings).getSingle();
+      // Use getSingleOrNull and fallback to a default if still null
+      final retry = await _db.select(_db.appSettings).getSingleOrNull();
+      if (retry == null) {
+        throw Exception('Failed to initialize application settings.');
+      }
+      return retry;
     }
     return settings;
   }
 
-  Stream<AppSetting> watchSettings() {
-    return _db.select(_db.appSettings).watchSingle();
+  Stream<AppSetting?> watchSettings() {
+    return _db.select(_db.appSettings).watchSingleOrNull();
   }
 
   /// Toggle dark mode
   Future<void> toggleTheme() async {
     final settings = await getSettings();
-    await _db.update(_db.appSettings).write(
+    await (_db.update(_db.appSettings)..where((t) => t.id.equals(0))).write(
       AppSettingsCompanion(isDarkMode: Value(!settings.isDarkMode)),
     );
   }
 }
+

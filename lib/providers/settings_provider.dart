@@ -11,7 +11,22 @@ class SettingsState extends _$SettingsState {
   Stream<AppSetting> build() async* {
     final db = await ref.watch(appDatabaseProvider.future);
     final repo = AuthRepository(db);
-    yield* repo.watchSettings();
+    
+    await for (final settings in repo.watchSettings()) {
+      if (settings != null) {
+        print('[Virgo] Settings Loaded: hasOnboarding=${settings.hasCompletedOnboarding}');
+        yield settings;
+      } else {
+        // Fallback to a default object rather than yielding nothing (which causes hangs)
+        print('[Virgo] Settings Null - yielding defaults');
+        yield AppSetting(
+          id: 0,
+          hasCompletedOnboarding: false,
+          currentUserId: null,
+          isDarkMode: false,
+        );
+      }
+    }
   }
 
   Future<void> setOnboardingComplete() async {

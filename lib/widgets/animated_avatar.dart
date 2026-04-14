@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:virgo/core/theme/app_colors.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 
 class AnimatedAvatar extends StatefulWidget {
   final String name;
@@ -73,18 +73,18 @@ class _AnimatedAvatarState extends State<AnimatedAvatar> with SingleTickerProvid
       height: widget.radius * 2,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.wineLight,
-            AppColors.wine,
+            context.appColors.wineLight,
+            context.appColors.wine,
           ],
         ),
         boxShadow: widget.animate
             ? [
                 BoxShadow(
-                  color: AppColors.wine.withValues(alpha:0.4),
+                  color: context.appColors.wine.withValues(alpha: 0.4),
                   blurRadius: 16,
                   spreadRadius: 2,
                 )
@@ -95,7 +95,7 @@ class _AnimatedAvatarState extends State<AnimatedAvatar> with SingleTickerProvid
         child: Text(
           _initials,
           style: TextStyle(
-            color: AppColors.surfaceLight,
+            color: context.colorScheme.onPrimary,
             fontSize: widget.radius * 0.8,
             fontWeight: FontWeight.bold,
           ),
@@ -117,3 +117,4 @@ class _AnimatedAvatarState extends State<AnimatedAvatar> with SingleTickerProvid
     return avatar;
   }
 }
+

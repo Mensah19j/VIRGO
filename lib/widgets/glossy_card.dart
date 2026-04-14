@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:virgo/core/theme/app_colors.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 
 class GlossyCard extends StatelessWidget {
   final Widget child;
@@ -17,20 +17,18 @@ class GlossyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Container(
       margin: margin,
       decoration: BoxDecoration(
-        color: theme.cardTheme.color,
+        color: context.theme.cardTheme.color,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          color: context.colorScheme.outline,
         ),
         boxShadow: [
           BoxShadow(
-            color: (isDark ? Colors.black : AppColors.wine).withValues(alpha:0.08),
+            color: (context.isDark ? Colors.black : context.colorScheme.primary)
+                .withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -59,7 +57,7 @@ class GlossyCard extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.white.withValues(alpha:isDark ? 0.1 : 0.45),
+                        Colors.white.withValues(alpha: context.isDark ? 0.1 : 0.45),
                         Colors.transparent,
                       ],
                     ),
@@ -78,3 +76,4 @@ class GlossyCard extends StatelessWidget {
     );
   }
 }
+

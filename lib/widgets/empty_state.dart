@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:virgo/core/theme/app_colors.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 
 class EmptyState extends StatelessWidget {
   final String title;
@@ -29,32 +29,30 @@ class EmptyState extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark 
-                    ? AppColors.surfaceElevatedDark 
-                    : AppColors.backgroundLight,
+                color: context.colorScheme.surfaceContainerHighest,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: AppColors.gold.withValues(alpha:0.3),
+                  color: context.colorScheme.secondary.withValues(alpha: 0.3),
                   width: 2,
                 ),
               ),
               child: Icon(
                 icon,
                 size: 64,
-                color: AppColors.gold,
+                color: context.colorScheme.secondary,
               ),
             ),
             const SizedBox(height: 24),
             Text(
               title,
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: context.textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
               message,
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha:0.7),
+                color: context.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                 fontSize: 16,
               ),
               textAlign: TextAlign.center,
@@ -66,8 +64,8 @@ class EmptyState extends StatelessWidget {
                 icon: const Icon(Icons.refresh),
                 label: Text(actionLabel!),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.wine,
-                  foregroundColor: AppColors.surfaceLight,
+                  backgroundColor: context.colorScheme.primary,
+                  foregroundColor: context.colorScheme.onPrimary,
                 ),
               ),
             ],
@@ -77,3 +75,4 @@ class EmptyState extends StatelessWidget {
     );
   }
 }
+

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:virgo/core/theme/app_colors.dart';
+import 'package:virgo/core/utils/theme_extensions.dart';
 
 class AppTextField extends StatefulWidget {
   final String label;
@@ -47,10 +47,10 @@ class _AppTextFieldState extends State<AppTextField> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             widget.label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.wineLight, // Soft wine color for labels
+              color: context.colorScheme.primary.withValues(alpha: 0.85),
             ),
           ),
         ),
@@ -71,8 +71,8 @@ class _AppTextFieldState extends State<AppTextField> {
             suffixIcon: widget.isPassword
                 ? IconButton(
                     icon: Icon(
-                      _obscureText ? Icons.visibility_off : Icons.visibility,
-                      color: AppColors.textSecondaryLight,
+                      _obscureText ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                      color: context.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                     onPressed: () {
                       setState(() {
@@ -87,3 +87,4 @@ class _AppTextFieldState extends State<AppTextField> {
     );
   }
 }
+

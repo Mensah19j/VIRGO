@@ -5,6 +5,7 @@ import 'package:virgo/models/enums.dart';
 import 'package:virgo/providers/school_update_provider.dart';
 import 'package:virgo/widgets/empty_state.dart';
 import 'package:virgo/widgets/loading_indicator.dart';
+import 'package:virgo/widgets/theme_switcher.dart';
 import 'package:virgo/widgets/update_card.dart';
 
 class StudentFeedScreen extends ConsumerStatefulWidget {
@@ -25,6 +26,7 @@ class _StudentFeedScreenState extends ConsumerState<StudentFeedScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('School News'),
+        actions: const [ThemeSwitcher()],
       ),
       body: Column(
         children: [
@@ -107,3 +109,4 @@ class _StudentFeedScreenState extends ConsumerState<StudentFeedScreen> {
     );
   }
 }
+

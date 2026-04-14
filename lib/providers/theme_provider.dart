@@ -13,7 +13,11 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
     final repo = AuthRepository(db);
 
     await for (final settings in repo.watchSettings()) {
-      yield settings.isDarkMode ? ThemeMode.dark : ThemeMode.light;
+      if (settings == null) {
+        yield ThemeMode.system;
+      } else {
+        yield settings.isDarkMode ? ThemeMode.dark : ThemeMode.light;
+      }
     }
   }
 
